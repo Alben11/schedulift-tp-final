@@ -1,0 +1,56 @@
+services:
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
+    
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - schedulift-network
+
+  
+  schedulift-api:
+    image: alben11/schedulift-api:${BACKEND_VERSION}
+    build:
+      context: ./k8s-manifests/schedulift-api
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      DB_HOST: db
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      DB_PORT: "3306"
+      DB_NAME: ${MYSQL_DATABASE}
+    ports:
+      - "3005:3005"
+    depends_on:
+      - db
+    networks:
+      - schedulift-network
+
+  schedulift-frontend:
+    image: alben11/schedulift-frontend:${FRONTEND_VERSION}
+    build:
+      context: ./k8s-manifests/schedulift-frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    depends_on:
+      - schedulift-api
+    networks:
+      - schedulift-network
+
+volumes:
+  db_data:
+
+networks:
+  schedulift-network:
+    driver: bridge

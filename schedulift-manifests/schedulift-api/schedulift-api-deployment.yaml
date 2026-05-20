@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: schedulift-api
+  namespace: matonde-alben-ns
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: schedulift-api
+  template:
+    metadata:
+      labels:
+        app: schedulift-api
+    spec:
+      containers:
+        - name: schedulift-api
+          image: alben11/schedulift-api:1.0 
+          ports:
+            - containerPort: 3005
+          env:
+            - name: PORT
+              value: "3005"
+            - name: DB_HOST
+              value: "10.10.3.11"
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_NAME
+              value: "schedulift_db"
+            - name: DB_USERNAME   
+              value: "schedulift_user"       
+            - name: DB_PASSWORD
+              value: "schedulift_password"       

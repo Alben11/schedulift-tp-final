@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: schedulift-api
+spec:
+  type: NodePort
+  ports:
+    - port: 3005
+      targetPort: 3005
+  selector:
+    app: schedulift-api
